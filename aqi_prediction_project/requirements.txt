@@ -8,3 +8,9 @@ python-dotenv
 seaborn
 joblib
 xgboost
+hopsworks
+torch                  
+torchvision                
+lightgbm                 
+shap                                    
+optuna 
