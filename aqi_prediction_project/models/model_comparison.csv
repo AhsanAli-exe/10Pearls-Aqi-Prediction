@@ -1,6 +1,6 @@
 ,RMSE,MAE,R2
-Random Forest,0.5395,0.1394,1.0
-Ridge Regression,0.1722,0.0631,1.0
-XGBoost,1.046,0.6862,0.9998
-LightGBM,1.0051,0.5392,0.9998
-PyTorch Neural Network,18.32,15.3366,0.9434
+Random Forest,0.7766,0.1348,0.9999
+Ridge Regression,0.0334,0.019,1.0
+XGBoost,1.0574,0.671,0.9998
+LightGBM,1.1256,0.5668,0.9998
+PyTorch Neural Network,6.6811,5.1048,0.9925
