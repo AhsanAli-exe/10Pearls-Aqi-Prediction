@@ -12,7 +12,7 @@ st.set_page_config(
 
 def local_css(file_name):
     with open(file_name) as f:
-        st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+        st.markdown(f'<style>{f.read()}</style>',unsafe_allow_html=True)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CSS_FILE = os.path.join(BASE_DIR,"static","style.css")
@@ -26,20 +26,28 @@ FLASK_API_URL = "http://127.0.0.1:5000/predict"
 def get_aqi_category(aqi):
     aqi = int(aqi)
     if aqi <= 50:
-        return "Good", "#4CAF50", "White"
+        return "Good","#4CAF50","White"
     elif aqi <= 100:
-        return "Moderate", "#FFEB3B", "Black"
+        return "Moderate","#FFEB3B","Black"
     elif aqi <= 150:
-        return "Unhealthy for Sensitive Groups", "#FF9800", "White"
+        return "Unhealthy for Sensitive Groups","#FF9800","White"
     elif aqi <= 200:
-        return "Unhealthy", "#F44336", "White"
+        return "Unhealthy","#F44336","White"
     elif aqi <= 300:
-        return "Very Unhealthy", "#9C27B0", "White"
+        return "Very Unhealthy","#9C27B0","White"
     else:
-        return "Hazardous", "#795548", "White"
+        return "Hazardous","#795548","White"
 
-st.title("10 Pearls AQI Predictor 🌬️")
+st.title("_AQI_ _Prediction_ :blue[Model] :sunglasses:")
+st.header("Developed by: :blue[Ahsan Ali]")
 st.write("Predicting the Air Quality Index for the next 3 days in Karachi.")
+
+with st.sidebar:
+    st.title("[Ahsan Ali's LinkedIn](https://www.linkedin.com/in/ahsan--ali)")
+    st.sidebar.title("ℹ️ How to Use")
+    st.sidebar.write("Click the button below to get the AQI prediction for the next 3 days.")
+
+
 
 if st.button("Get AQI Prediction"):
     try:
@@ -52,12 +60,12 @@ if st.button("Get AQI Prediction"):
         st.subheader("3-Day AQI Forecast")
         col1,col2,col3 = st.columns(3)
         days = ["Today","Tomorrow","Day After Tomorrow"]
-        aqi_values = [predictions['day1_aqi'], predictions['day2_aqi'], predictions['day3_aqi']]
+        aqi_values = [predictions['day1_aqi'],predictions['day2_aqi'],predictions['day3_aqi']]
 
-        for i, col in enumerate([col1, col2, col3]):
+        for i,col in enumerate([col1,col2,col3]):
             with col:
                 aqi = aqi_values[i]
-                category, color, text_color = get_aqi_category(aqi)
+                category,color,text_color = get_aqi_category(aqi)
                 st.markdown(
                     f'''
                     <div class="metric-card" style="background-color: {color}; color: {text_color};">

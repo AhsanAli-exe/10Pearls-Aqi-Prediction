@@ -3,7 +3,7 @@ from predictor import generate_sample_features,predict_aqi
 
 app = Flask(__name__)
 
-@app.route('/predict', methods=['GET'])
+@app.route('/predict',methods=['GET'])
 def get_prediction():
     predictions = []
     for _ in range(3):
@@ -17,9 +17,9 @@ def get_prediction():
         'day3_aqi': predictions[2],
     })
 
-@app.route('/', methods=['GET'])
+@app.route('/',methods=['GET'])
 def health_check():
     return "Flask API is running!"
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+
+app.run(debug=True,port=5000)

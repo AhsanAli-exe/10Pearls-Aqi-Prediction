@@ -15,10 +15,10 @@ warnings.filterwarnings('ignore')
 class AQIPredictor(nn.Module):
     def __init__(self, input_size):
         super(AQIPredictor, self).__init__()
-        self.fc1 = nn.Linear(input_size, 128)
-        self.fc2 = nn.Linear(128, 64)
-        self.fc3 = nn.Linear(64, 32)
-        self.fc4 = nn.Linear(32, 1)
+        self.fc1 = nn.Linear(input_size,128)
+        self.fc2 = nn.Linear(128,64)
+        self.fc3 = nn.Linear(64,32)
+        self.fc4 = nn.Linear(32,1)
         self.dropout = nn.Dropout(0.2)
         self.relu = nn.ReLU()
 
@@ -31,21 +31,21 @@ class AQIPredictor(nn.Module):
         x = self.fc4(x)
         return x
 
-def evaluate_model(y_true, y_pred, model_name):
-    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
-    mae = mean_absolute_error(y_true, y_pred)
-    r2 = r2_score(y_true, y_pred)
+def evaluate_model(y_true,y_pred,model_name):
+    rmse = np.sqrt(mean_squared_error(y_true,y_pred))
+    mae = mean_absolute_error(y_true,y_pred)
+    r2 = r2_score(y_true,y_pred)
     print(f'{model_name} Performance:')
     print(f'RMSE: {rmse:.4f}')
     print(f'MAE: {mae:.4f}')
     print(f'R2 Score: {r2:.4f}')
     print('\n')
-    return {'RMSE': rmse, 'MAE': mae, 'R2': r2}
+    return {'RMSE': rmse,'MAE': mae,'R2': r2}
 
 
-project = hopsworks.login(project="aqi_prediction72", api_key_file="hopsworks.key")
+project = hopsworks.login(project="aqi_prediction72",api_key_file="hopsworks.key")
 fs = project.get_feature_store()
-feature_view = fs.get_feature_view("aqi_prediction_online", version=1)
+feature_view = fs.get_feature_view("aqi_prediction_online",version=1)
 
 try:
     td_version, td_job = feature_view.create_train_test_split(
@@ -54,15 +54,15 @@ try:
         description="AQI Prediction Training dataset"
     )
 except:
-    td_version = 1 # a training dataset version is already created, so we will use that
+    td_version = 1 
 
-X_train, X_test, y_train, y_test = feature_view.get_train_test_split(
+X_train,X_test,y_train,y_test = feature_view.get_train_test_split(
     training_dataset_version=td_version,
     test_size=0.2,
     random_state=42
 )
 
-drop_cols = [c for c in ['timestamp', 'aqi', 'ts_epoch_ms'] if c in X_train.columns]
+drop_cols = [c for c in ['timestamp','aqi','ts_epoch_ms'] if c in X_train.columns]
 feature_columns = [c for c in X_train.columns if c not in drop_cols]
 
 X_train_features = X_train[feature_columns].copy()
@@ -79,9 +79,9 @@ model_results = {}
 trained_models = {}
 
 ridge = Ridge(alpha=1.0, random_state=42)
-ridge.fit(X_train_scaled, y_train)
+ridge.fit(X_train_scaled,y_train)
 ridge_predictions = ridge.predict(X_test_scaled)
-ridge_results = evaluate_model(y_test, ridge_predictions, "Ridge Regression")
+ridge_results = evaluate_model(y_test, ridge_predictions,"Ridge Regression")
 model_results['Ridge Regression'] = ridge_results
 trained_models['Ridge Regression'] = ridge
 
