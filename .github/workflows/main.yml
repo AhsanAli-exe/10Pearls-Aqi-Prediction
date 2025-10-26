@@ -1,0 +1,32 @@
+name: AQI Prediction CI/CD
+
+on:
+  workflow_dispatch: 
+  schedule:
+    - cron: "0 0 * * *" 
+
+jobs:
+  build-and-train:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r aqi_prediction_project/requirements.txt
+          pip install hopsworks
+
+      - name: Create Hopsworks API key file
+        run: echo "${{ secrets.HOPSWORKS_API_KEY }}" > hopsworks.key
+        
+      - name: Run Feature Engineering
+        run: python aqi_prediction_project/feature_engineering.py
+
+      - name: Run Model Training
+        run: python aqi_prediction_project/training.py

@@ -1,3 +1,7 @@
 hopsworks.key
+__pycache__/
+*.pyc
+.cache/
+.cache.sqlite
 
 
