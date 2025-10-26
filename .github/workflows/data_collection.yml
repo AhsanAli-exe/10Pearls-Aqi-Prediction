@@ -2,9 +2,8 @@ name: Automated Data Collection
 
 on:
   schedule:
-    # Run every 6 hours at minute 0
     - cron: '0 */6 * * *'
-  workflow_dispatch: # Allow manual triggering
+  workflow_dispatch: 
 
 jobs:
   collect-data:
@@ -22,23 +21,31 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r aqi_prediction_project/requirements.txt
+        cd aqi_prediction_project
+        pip install -r requirements.txt
 
     - name: Collect Karachi data (Karachi-only system)
       run: |
         cd aqi_prediction_project
         python collect_yearly_data.py
+        echo "✅ Data collection completed"
+        ls -la data/ 2>/dev/null || echo "❌ No data directory found"
 
     - name: Commit and push data updates
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add data/
-        if git diff --staged --quiet; then
-          echo "No data changes to commit"
+        cd aqi_prediction_project
+        if [ -d "data" ] && [ "$(ls -A data 2>/dev/null)" ]; then
+          git add data/
+          if git diff --staged --quiet; then
+            echo "No data changes to commit"
+          else
+            git commit -m "Automated data collection: $(date)"
+            git push
+          fi
         else
-          git commit -m "Automated data collection: $(date)"
-          git push
+          echo "No data directory or files found - skipping commit"
         fi
 
     - name: Cleanup old cache files

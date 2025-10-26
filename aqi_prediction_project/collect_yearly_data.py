@@ -95,55 +95,78 @@ def collect_air_quality_data(lat,lon,start_date,end_date):
         return None
     
 def collect_yearly_data_in_chunks(lat,lon,city_name="karachi"):
-    os.makedirs("data", exist_ok=True)
-    end_date = datetime.now().date()
-    start_date = end_date - timedelta(days=365)
-    print(f"COLLECTING 1 YEAR OF DATA FOR {city_name.upper()}")
-    print(f"Date range: {start_date} to {end_date}")
-    print("="*60)
-    
-    all_weather_data = []
-    all_air_quality_data = []
-    
-    current_date = start_date
-    month_count = 0
-    while current_date <= end_date:
-        month_count += 1
-        if current_date.month == 12:
-            next_month = current_date.replace(month=1, year=current_date.year + 1)
+    try:
+        os.makedirs("data", exist_ok=True)
+        end_date = datetime.now().date()
+        start_date = end_date - timedelta(days=365)
+        print(f"COLLECTING 1 YEAR OF DATA FOR {city_name.upper()}")
+        print(f"Date range: {start_date} to {end_date}")
+        print("="*60)
+
+        all_weather_data = []
+        all_air_quality_data = []
+
+        current_date = start_date
+        month_count = 0
+        while current_date <= end_date:
+            month_count += 1
+            if current_date.month == 12:
+                next_month = current_date.replace(month=1, year=current_date.year + 1)
+            else:
+                next_month = current_date.replace(month=current_date.month + 1)
+
+            chunk_end = min(next_month - timedelta(days=1),end_date)
+
+            weather_df = collect_weather_data(lat,lon,current_date,chunk_end)
+            if weather_df is not None:
+                all_weather_data.append(weather_df)
+            time.sleep(1)
+
+            air_quality_df = collect_air_quality_data(lat,lon,current_date,chunk_end)
+            if air_quality_df is not None:
+                all_air_quality_data.append(air_quality_df)
+
+            time.sleep(1)
+
+            current_date = next_month
+
+        print("\n" + "="*60)
+        print("Combining data...")
+
+        if all_weather_data:
+            combined_weather = pd.concat(all_weather_data, ignore_index=True)
+            combined_weather.to_csv(f"data/{city_name}_weather_1year.csv", index=False)
+            print(f"Weather data saved: {len(combined_weather)} records")
+
+            if all_air_quality_data:
+                combined_air_quality = pd.concat(all_air_quality_data, ignore_index=True)
+                combined_air_quality.to_csv(f"data/{city_name}_air_quality_1year.csv", index=False)
+                print(f"Air quality data saved: {len(combined_air_quality)} records")
+
+        print(f"\n🎉 SUCCESS! 1 year of data collected for {city_name}")
+        return combined_weather,combined_air_quality
+
+    except Exception as e:
+        print(f"❌ Error during data collection: {e}")
+        print("📝 This might be due to API rate limits or network issues")
+        return None, None
+
+    finally:
+        print(f"\n📊 DATA COLLECTION SUMMARY FOR {city_name.upper()}")
+        print("="*60)
+        if os.path.exists(f"data/{city_name}_weather_1year.csv"):
+            weather_df = pd.read_csv(f"data/{city_name}_weather_1year.csv")
+            print(f"✅ Weather data: {len(weather_df)} records")
         else:
-            next_month = current_date.replace(month=current_date.month + 1)
-        
-        chunk_end = min(next_month - timedelta(days=1),end_date)
-        
-        weather_df = collect_weather_data(lat,lon,current_date,chunk_end)
-        if weather_df is not None:
-            all_weather_data.append(weather_df)
-        time.sleep(1)
-        
-        air_quality_df = collect_air_quality_data(lat,lon,current_date,chunk_end)
-        if air_quality_df is not None:
-            all_air_quality_data.append(air_quality_df)
-        
-        time.sleep(1)
-        
-        current_date = next_month
-    
-    print("\n" + "="*60)
-    print("Combining data...")
-    
-    if all_weather_data:
-        combined_weather = pd.concat(all_weather_data, ignore_index=True)
-        combined_weather.to_csv(f"data/{city_name}_weather_1year.csv", index=False)
-        print(f"Weather data saved: {len(combined_weather)} records")
-    
-    if all_air_quality_data:
-        combined_air_quality = pd.concat(all_air_quality_data, ignore_index=True)
-        combined_air_quality.to_csv(f"data/{city_name}_air_quality_1year.csv", index=False)
-        print(f"Air quality data saved: {len(combined_air_quality)} records")
-    
-    print(f"\n🎉 SUCCESS! 1 year of data collected for {city_name}")
-    return combined_weather,combined_air_quality
+            print("❌ Weather data: Not found")
+
+        if os.path.exists(f"data/{city_name}_air_quality_1year.csv"):
+            air_df = pd.read_csv(f"data/{city_name}_air_quality_1year.csv")
+            print(f"✅ Air quality data: {len(air_df)} records")
+        else:
+            print("❌ Air quality data: Not found")
+
+        print("="*60)
 
 lat,lon = 24.8607,67.0011
 city = "karachi"
@@ -152,7 +175,7 @@ print("STARTING 1-YEAR DATA COLLECTION")
 print("This will take several minutes...")
 print("="*60)
 
-    
+
 weather_data,air_quality_data = collect_yearly_data_in_chunks(lat,lon,city)
     
     

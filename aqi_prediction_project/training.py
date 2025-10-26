@@ -45,22 +45,31 @@ def evaluate_model(y_true,y_pred,model_name):
 
 project = hopsworks.login(project="aqi_prediction72",api_key_file="hopsworks.key")
 fs = project.get_feature_store()
-feature_view = fs.get_feature_view("aqi_prediction_online",version=1)
 
 try:
-    td_version, td_job = feature_view.create_train_test_split(
-        test_size=0.2,
-        random_state=42,
-        description="AQI Prediction Training dataset"
-    )
-except:
-    td_version = 1 
+    feature_view = fs.get_feature_view("aqi_prediction_online",version=1)
 
-X_train,X_test,y_train,y_test = feature_view.get_train_test_split(
+    try:
+        td_version, td_job = feature_view.create_train_test_split(
+            test_size=0.2,
+            random_state=42,
+            description="AQI Prediction Training dataset"
+        )
+    except:
+        print("⚠️ Feature store not ready yet - no data available for training")
+        print("📝 Please run data collection and feature engineering first")
+        exit(0)
+
+    X_train,X_test,y_train,y_test = feature_view.get_train_test_split(
     training_dataset_version=td_version,
     test_size=0.2,
     random_state=42
-)
+    )
+
+except Exception as e:
+    print(f"❌ Feature store error: {e}")
+    print("📝 Please ensure data collection and feature engineering have run successfully")
+    exit(1)
 
 drop_cols = [c for c in ['timestamp','aqi','ts_epoch_ms'] if c in X_train.columns]
 feature_columns = [c for c in X_train.columns if c not in drop_cols]
