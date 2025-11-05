@@ -28,8 +28,8 @@ jobs:
       run: |
         cd aqi_prediction_project
         python collect_yearly_data.py
-        echo "✅ Data collection completed"
-        ls -la data/ 2>/dev/null || echo "❌ No data directory found"
+        echo "Data collection completed"
+        ls -la data/ 2>/dev/null || echo "No data directory found"
 
     - name: Commit and push data updates
       run: |
