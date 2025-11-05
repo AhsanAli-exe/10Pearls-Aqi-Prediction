@@ -13,8 +13,8 @@ except ImportError:
     import matplotlib.pyplot as plt
 
 st.set_page_config(
-    page_title="10 Pearls AQI Predictor",
-    page_icon="🌬️",
+    page_title="AQI Predictor",
+    page_icon=":airplane:",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -37,7 +37,6 @@ HISTORICAL_API_URL = f"{FLASK_API_URL}/historical"
 CURRENT_WEATHER_URL = f"{FLASK_API_URL}/weather/current"
 
 def get_aqi_category(aqi):
-    """Get AQI category, color, and text color"""
     aqi = int(aqi)
     if aqi <= 50:
         return "Good","#4CAF50","White"
@@ -52,7 +51,7 @@ def get_aqi_category(aqi):
     else:
         return "Hazardous","#795548","White"
 
-st.title("🌬️ Karachi AQI Prediction Model")
+st.title("_AQI_ _Prediction_ :blue[Model] :sunglasses:")
 st.header("Developed by: :blue[Ahsan Ali]")
 st.write("Real-time Air Quality Index prediction optimized for Karachi, Pakistan")
 
@@ -74,18 +73,18 @@ with st.sidebar:
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.subheader("📍 Karachi, Pakistan")
+    st.subheader("Karachi, Pakistan")
 
-    if st.button("🔮 Get Karachi AQI Prediction",type="primary",use_container_width=True):
+    if st.button("Get Karachi AQI Prediction",type="primary",use_container_width=True):
         try:
             with st.spinner("🌐 Fetching live Karachi weather data and generating predictions..."):
                 response = requests.get(f"{PREDICT_API_URL}")
                 response.raise_for_status()
                 predictions = response.json()
 
-            st.success("✅ Prediction successful!")
+            st.success("Prediction successful!")
 
-            st.subheader("📅 3-Day AQI Forecast")
+            st.subheader("3-Day AQI Forecast")
 
             pred_data = predictions['predictions']
             aqi_values = [pred_data['day1_aqi'],pred_data['day2_aqi'],pred_data['day3_aqi']]
@@ -134,7 +133,7 @@ with col1:
         except requests.exceptions.RequestException as e:
             st.error(f"🌐 Could not connect to the prediction API. Please ensure the Flask API is running on port 5000. Error: {e}")
         except Exception as e:
-            st.error(f"❌ An unexpected error occurred: {e}")
+            st.error(f"An unexpected error occurred: {e}")
 
 with col2:
     st.subheader("🌤️ Current Weather Data")
@@ -182,15 +181,16 @@ with col2:
     st.info("""
     **Karachi-Optimized Features:**
     - Real-time weather data from Open-Meteo API
-    - Current air quality measurements (PM2.5, PM10, CO, NO₂, O₃, SO₂)
-    - Time-based features (hour, day, month, weekday)
+    - Current air quality measurements (PM2.5,PM10,CO,NO₂,O₃,SO₂)
+    - Time-based features (hour,day,month,weekday)
     - Weather-pollution interaction features
     - Ridge Regression model with enhanced sensitivity
     """)
 
-    st.success("✅ **No historical bias** - predictions based purely on current conditions")
+    st.success("Predictions based purely on current conditions")
 
 st.markdown("---")
-st.caption("🔬 Karachi-Optimized ML | 📡 Real-time Weather Data | 📊 Current Conditions Only | 🎯 95%+ Accuracy")
+st.caption("Made by Ahsan Ali")
+st.caption("GitHub: [Ahsan Ali](https://github.com/AhsanAli-exe)")
 
 
