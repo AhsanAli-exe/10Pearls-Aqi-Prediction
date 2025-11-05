@@ -31,9 +31,9 @@ jobs:
       - name: Run Feature Engineering
         run: |
           cd aqi_prediction_project
-          python feature_engineering.py || echo "⚠️ Feature engineering failed - Hopsworks not available or no data yet"
+          python feature_engineering.py || echo "Feature engineering failed - Hopsworks not available or no data yet"
 
       - name: Run Model Training
         run: |
           cd aqi_prediction_project
-          python training.py || echo "⚠️ Model training failed - feature store not ready yet"
+          python training.py || echo "Model training failed - feature store not ready yet"
